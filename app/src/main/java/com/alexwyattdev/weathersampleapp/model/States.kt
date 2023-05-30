@@ -1,9 +1,15 @@
 package com.alexwyattdev.weathersampleapp.model
 
+import com.alexwyattdev.weathersampleapp.Constants.Companion.emptySelectionString
+
+// Object to get the list of all USA States and their ISO-3166 codes
+// and adding an empty item so the user can do a "deselect"
+// With an implementation where the user can type into the box, this extra item
+// would not be required
 object States {
     val usStates =
         listOf(
-            DropDownItem(name = "-", code = ""),
+            DropDownItem(name = emptySelectionString, code = ""),
             DropDownItem(name = "Alabama", code = "US_AL"),
             DropDownItem(name = "Alaska", code = "US_AK"),
             DropDownItem(name = "Arizona", code = "US_AZ"),

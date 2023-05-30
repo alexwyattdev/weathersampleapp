@@ -2,6 +2,7 @@ package com.alexwyattdev.weathersampleapp.model
 
 import com.google.gson.annotations.SerializedName
 
+// The API response
 data class WeatherResponse(
     @SerializedName("weather")
     val weather: List<Weather>?,

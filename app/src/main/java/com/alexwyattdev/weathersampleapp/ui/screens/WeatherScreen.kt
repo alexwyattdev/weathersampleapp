@@ -69,6 +69,7 @@ fun WeatherScreen(
     onRefresh: () -> Unit,
     onErrorShown: () -> Unit,
 ) {
+    // Defining variables
     val systemUiController = rememberSystemUiController()
     val statusBarColor = MaterialTheme.colorScheme.primary
     val snackBarHostState = remember { SnackbarHostState() }
@@ -79,6 +80,7 @@ fun WeatherScreen(
     val invalidCityError = stringResource(id = R.string.error_invalid_city)
     val invalidLocationError = stringResource(id = R.string.error_invalid_location)
 
+    // Make sure the status bar has the correct color and changes the icon colors accordingly
     SideEffect {
         systemUiController.setStatusBarColor(
             color = statusBarColor,
@@ -181,10 +183,15 @@ fun WeatherScreen(
 
 @Composable
 fun WeatherInfoDisplay(weatherInfo: WeatherInfo?) {
+    // This displays the dynamic weather icon, the temperature, the city name retrieved from API
+    // the current date, and if available, the rain amount of the last hour, or last 3 hours
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
+        // This loads the appropriate image based on the API response
+        // Given time, it could be improved so the placeholder and error drawable has the
+        // same color as the texts below
         AsyncImage(
             modifier = Modifier.size(128.dp),
             model = weatherInfo?.icon,
@@ -196,6 +203,7 @@ fun WeatherInfoDisplay(weatherInfo: WeatherInfo?) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // Temperature display
         Text(
             text = stringResource(id = R.string.temperature, weatherInfo?.temperature ?: ""),
             style = MaterialTheme.typography.displayMedium,
@@ -204,6 +212,7 @@ fun WeatherInfoDisplay(weatherInfo: WeatherInfo?) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // City name that comes from the API response
         Text(
             text = weatherInfo?.cityName ?: "",
             style = MaterialTheme.typography.displaySmall,
@@ -212,6 +221,7 @@ fun WeatherInfoDisplay(weatherInfo: WeatherInfo?) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // Display the current date in "dayName, monthName dayNumber, year" format
         Text(
             text = getCurrentDate(),
             style = MaterialTheme.typography.titleLarge,
@@ -221,6 +231,7 @@ fun WeatherInfoDisplay(weatherInfo: WeatherInfo?) {
         weatherInfo?.rain1h?.let {
             Spacer(modifier = Modifier.height(8.dp))
 
+            // If available, show the rain amount for the last hour
             Text(
                 text = stringResource(id = R.string.rain_1h, it),
                 style = MaterialTheme.typography.titleMedium,
@@ -231,6 +242,7 @@ fun WeatherInfoDisplay(weatherInfo: WeatherInfo?) {
         weatherInfo?.rain3h?.let {
             Spacer(modifier = Modifier.height(4.dp))
 
+            // If available, show the rain amount for the last 3 hours
             Text(
                 text = stringResource(id = R.string.rain_3h, it),
                 style = MaterialTheme.typography.titleMedium,
@@ -242,6 +254,7 @@ fun WeatherInfoDisplay(weatherInfo: WeatherInfo?) {
 
 @Composable
 fun TemperatureDetails(weatherInfo: WeatherInfo?) {
+    // This section displays the Feels Like, Minimum, Maximum values
     Row(
         modifier = Modifier.fillMaxWidth().height(100.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -283,6 +296,7 @@ fun TemperatureDetails(weatherInfo: WeatherInfo?) {
 
 @Composable
 fun WeatherDetails(weatherInfo: WeatherInfo?) {
+    // This section displays the Wind speed, wind direction and humidity values
     Row(
         modifier = Modifier.fillMaxWidth().height(100.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -328,6 +342,7 @@ fun WeatherDetailText(
     stringResourceId: Int? = null,
     labelResourceId: Int,
 ) {
+    // Custom composable to still be able to display the labels if there are no values available
     Column(
         modifier = modifier.fillMaxHeight(),
         verticalArrangement = Arrangement.Center,

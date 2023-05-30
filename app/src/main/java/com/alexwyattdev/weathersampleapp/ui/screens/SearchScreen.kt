@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -45,50 +46,39 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.alexwyattdev.weathersampleapp.Constants.Companion.emptySelectionString
 import com.alexwyattdev.weathersampleapp.R
+import com.alexwyattdev.weathersampleapp.model.Countries
 import com.alexwyattdev.weathersampleapp.model.DropDownItem
 import com.alexwyattdev.weathersampleapp.model.States
 import com.alexwyattdev.weathersampleapp.ui.theme.WeatherSampleAppTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(onSearch: (String, String, String) -> Unit, onBack: () -> Unit) {
+    // Defining variables
     val systemUiController = rememberSystemUiController()
     val statusBarColor = MaterialTheme.colorScheme.onPrimary
     var cityName by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
-    val emptySelectionString = "-"
     var selectedState by remember { mutableStateOf(DropDownItem(emptySelectionString, "")) }
     var selectedCountry by remember { mutableStateOf(DropDownItem(emptySelectionString, "")) }
     var stateSelectorExpanded by remember { mutableStateOf(false) }
     var countrySelectorExpanded by remember { mutableStateOf(false) }
     val states = remember { mutableStateOf(States.usStates) }
-    val countries = remember {
-        mutableStateOf(
-            listOf(
-                DropDownItem(name = emptySelectionString, code = ""),
-                *Locale.getISOCountries().map { code ->
-                    val locale = Locale("", code)
-                    DropDownItem(
-                        code = code,
-                        name = locale.displayCountry,
-                    )
-                }.toTypedArray(),
-            ),
-        )
-    }
+    val countries = remember { mutableStateOf(Countries.countries) }
 
     fun handleSearch() {
         if (cityName.isNotEmpty() && cityName.length > 2) {
             showError = false
-            onSearch(cityName, selectedState.code, selectedCountry.code)
+            onSearch(cityName.trim(), selectedState.code, selectedCountry.code)
         } else {
             showError = true
         }
     }
 
+    // Make sure the status bar has the correct color and changes the icon colors accordingly
     SideEffect {
         systemUiController.setStatusBarColor(
             color = statusBarColor,
@@ -132,13 +122,14 @@ fun SearchScreen(onSearch: (String, String, String) -> Unit, onBack: () -> Unit)
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                // City name input field
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp)
+                        .padding(top = 16.dp, start = 4.dp, end = 4.dp)
                         .shadow(4.dp, RoundedCornerShape(4.dp)),
                     shape = RoundedCornerShape(4.dp),
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                 ) {
                     TextField(
                         modifier = Modifier.fillMaxWidth(),
@@ -156,9 +147,10 @@ fun SearchScreen(onSearch: (String, String, String) -> Unit, onBack: () -> Unit)
                         shape = RoundedCornerShape(4.dp),
                         textStyle = MaterialTheme.typography.bodyLarge,
                         colors = TextFieldDefaults.textFieldColors(
-                            containerColor = MaterialTheme.colorScheme.onPrimary,
-                            textColor = MaterialTheme.colorScheme.primary,
-                            cursorColor = MaterialTheme.colorScheme.primary,
+                            containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            textColor = MaterialTheme.colorScheme.primaryContainer,
+                            cursorColor = MaterialTheme.colorScheme.primaryContainer,
+                            placeholderColor = MaterialTheme.colorScheme.primaryContainer,
                             unfocusedIndicatorColor = Color.Transparent,
                             focusedIndicatorColor = Color.Transparent,
                             disabledIndicatorColor = Color.Transparent,
@@ -168,6 +160,7 @@ fun SearchScreen(onSearch: (String, String, String) -> Unit, onBack: () -> Unit)
                     )
                 }
 
+                // City name error text
                 Text(
                     modifier = Modifier.padding(top = 4.dp),
                     text = if (showError) stringResource(id = R.string.city_name_too_short) else "",
@@ -176,12 +169,15 @@ fun SearchScreen(onSearch: (String, String, String) -> Unit, onBack: () -> Unit)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // State selector dropdown, additional improvements could be made by
+                // allowing the user to start typing in the state name
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(horizontal = 4.dp)
                         .shadow(4.dp, RoundedCornerShape(4.dp)),
                     shape = RoundedCornerShape(4.dp),
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                 ) {
                     ExposedDropdownMenuBox(
                         modifier = Modifier.fillMaxWidth(),
@@ -201,9 +197,10 @@ fun SearchScreen(onSearch: (String, String, String) -> Unit, onBack: () -> Unit)
                             shape = RoundedCornerShape(4.dp),
                             textStyle = MaterialTheme.typography.bodyLarge,
                             colors = TextFieldDefaults.textFieldColors(
-                                containerColor = MaterialTheme.colorScheme.onPrimary,
-                                textColor = MaterialTheme.colorScheme.primary,
-                                cursorColor = MaterialTheme.colorScheme.primary,
+                                containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                textColor = MaterialTheme.colorScheme.primaryContainer,
+                                cursorColor = MaterialTheme.colorScheme.primaryContainer,
+                                placeholderColor = MaterialTheme.colorScheme.primaryContainer,
                                 unfocusedIndicatorColor = Color.Transparent,
                                 focusedIndicatorColor = Color.Transparent,
                                 disabledIndicatorColor = Color.Transparent,
@@ -215,22 +212,25 @@ fun SearchScreen(onSearch: (String, String, String) -> Unit, onBack: () -> Unit)
                             },
                         )
 
-                        ExposedDropdownMenu(
+                        DropdownMenu(
                             modifier = Modifier
                                 .exposedDropdownSize(true)
-                                .background(color = MaterialTheme.colorScheme.onPrimary),
+                                .background(color = MaterialTheme.colorScheme.onPrimaryContainer),
                             expanded = stateSelectorExpanded,
                             onDismissRequest = { stateSelectorExpanded = false },
                         ) {
                             states.value.forEach { item ->
                                 DropdownMenuItem(
                                     colors = MenuDefaults.itemColors(
-                                        textColor = MaterialTheme.colorScheme.primary,
+                                        textColor = MaterialTheme.colorScheme.primaryContainer,
                                     ),
                                     text = { Text(text = item.name) },
                                     onClick = {
                                         selectedState = item
                                         stateSelectorExpanded = false
+                                        if (selectedState.name != emptySelectionString) {
+                                            selectedCountry = Countries.usCountry
+                                        }
                                     },
                                 )
                             }
@@ -240,12 +240,15 @@ fun SearchScreen(onSearch: (String, String, String) -> Unit, onBack: () -> Unit)
 
                 Spacer(modifier = Modifier.height(40.dp))
 
+                // Country selector dropdown, additional improvements could be made by
+                // allowing the user to start typing in the country name
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(horizontal = 4.dp)
                         .shadow(4.dp, RoundedCornerShape(4.dp)),
                     shape = RoundedCornerShape(4.dp),
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                 ) {
                     ExposedDropdownMenuBox(
                         modifier = Modifier.fillMaxWidth(),
@@ -265,9 +268,10 @@ fun SearchScreen(onSearch: (String, String, String) -> Unit, onBack: () -> Unit)
                             shape = RoundedCornerShape(4.dp),
                             textStyle = MaterialTheme.typography.bodyLarge,
                             colors = TextFieldDefaults.textFieldColors(
-                                containerColor = MaterialTheme.colorScheme.onPrimary,
-                                textColor = MaterialTheme.colorScheme.primary,
-                                cursorColor = MaterialTheme.colorScheme.primary,
+                                containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                textColor = MaterialTheme.colorScheme.primaryContainer,
+                                cursorColor = MaterialTheme.colorScheme.primaryContainer,
+                                placeholderColor = MaterialTheme.colorScheme.primaryContainer,
                                 unfocusedIndicatorColor = Color.Transparent,
                                 focusedIndicatorColor = Color.Transparent,
                                 disabledIndicatorColor = Color.Transparent,
@@ -279,17 +283,17 @@ fun SearchScreen(onSearch: (String, String, String) -> Unit, onBack: () -> Unit)
                             },
                         )
 
-                        ExposedDropdownMenu(
+                        DropdownMenu(
                             modifier = Modifier
                                 .exposedDropdownSize(true)
-                                .background(color = MaterialTheme.colorScheme.onPrimary),
+                                .background(color = MaterialTheme.colorScheme.onPrimaryContainer),
                             expanded = countrySelectorExpanded,
                             onDismissRequest = { countrySelectorExpanded = false },
                         ) {
                             countries.value.forEach { item ->
                                 DropdownMenuItem(
                                     colors = MenuDefaults.itemColors(
-                                        textColor = MaterialTheme.colorScheme.primary,
+                                        textColor = MaterialTheme.colorScheme.primaryContainer,
                                     ),
                                     text = { Text(text = item.name) },
                                     onClick = {
@@ -304,17 +308,14 @@ fun SearchScreen(onSearch: (String, String, String) -> Unit, onBack: () -> Unit)
 
                 Spacer(modifier = Modifier.height(36.dp))
 
+                // Search button
                 Button(
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .height(52.dp)
                         .fillMaxWidth(),
                     onClick = {
-                        if (cityName.isNotBlank() && cityName.length > 2) {
-                            onSearch(cityName, selectedState.code, selectedCountry.code)
-                        } else {
-                            showError = true
-                        }
+                        handleSearch()
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,

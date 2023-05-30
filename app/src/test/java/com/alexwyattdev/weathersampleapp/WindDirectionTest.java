@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+// Unit test to check whether the wind direction conversion results in the desired output
 public class WindDirectionTest {
 
     @Test

@@ -1,5 +1,7 @@
 package com.alexwyattdev.weathersampleapp.ui.theme
 
+// Default generated Colors.kt
+
 import androidx.compose.ui.graphics.Color
 
 val Purple80 = Color(0xFFD0BCFF)

@@ -3,6 +3,7 @@ package com.alexwyattdev.weathersampleapp.model
 import com.alexwyattdev.weathersampleapp.util.toIconUrl
 import com.alexwyattdev.weathersampleapp.util.toWindDirection
 
+// Class to provide for the UI with ready-made data
 data class WeatherInfo(
     val cityName: String? = null,
     val temperature: String? = null,

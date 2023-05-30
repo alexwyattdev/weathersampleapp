@@ -26,6 +26,7 @@ import retrofit2.HttpException
 import timber.log.Timber
 import javax.inject.Inject
 
+// The viewmodel to handle the API requests, and some location management
 @HiltViewModel
 class WeatherViewModel @Inject constructor(
     private val weatherRepository: WeatherRepository,
@@ -50,6 +51,8 @@ class WeatherViewModel @Inject constructor(
     private val locationRequest = buildLocationRequest()
     private val locationCallback = buildLocationCallback()
 
+    // User activated the pull to refresh function, depending on what was the last fetch type
+    // the app reloads the weather information
     fun refresh(apiKey: String) {
         when (lastFetchType) {
             LastFetchType.CITY -> {
@@ -95,24 +98,33 @@ class WeatherViewModel @Inject constructor(
         }
     }
 
+    // If there is no cityName given, check if there is one saved in SharedPreferences,
+    // If there is no saved city name, then the app should not stay in the loading state
     fun fetchWeatherByCityName(
-        cityName: String,
+        cityName: String?,
         stateCode: String = "",
         countryCode: String = "",
         apiKey: String,
     ) {
-        saveCityName(cityName)
-        saveStateCode(stateCode)
-        saveCountryCode(countryCode)
-        val query = buildQuery(cityName)
-        fetchWeatherData(LastFetchType.CITY) {
-            weatherRepository.getWeatherByCityName(query, apiKey)
+        val savedCityName = cityName ?: getCityName()
+        savedCityName?.let {
+            saveCityName(it)
+            saveStateCode(stateCode)
+            saveCountryCode(countryCode)
+            val query = buildQuery(it)
+            fetchWeatherData(LastFetchType.CITY) {
+                weatherRepository.getWeatherByCityName(query, apiKey)
+            }
+        } ?: kotlin.run {
+            _isLoading.value = false
         }
     }
 
     fun getCityName(): String? = preferencesManager.getCityName()
     fun permissionWasAsked() = preferencesManager.permissionWasAsked()
     fun permissionWasAskedBefore(): Boolean = preferencesManager.permissionWasAskedBefore()
+
+    // Avoid getting error Snackbar displays by resetting the error if the user already has seen it
     fun resetError() {
         _errorType.value = null
     }
@@ -136,12 +148,15 @@ class WeatherViewModel @Inject constructor(
     private fun getStateCode(): String? = preferencesManager.getStateCode()
     private fun getCountryCode(): String? = preferencesManager.getCountryCode()
 
+    // Build the query for the API so it can handle if the user only searches by city, or
+    // by city + state code, or by city + state code + country code, or by city + country code
     private fun buildQuery(cityName: String): String {
         val stateCode = getStateCode()
         val countryCode = getCountryCode()
         return "$cityName,${stateCode.orEmpty()},${countryCode.orEmpty()}".trimEnd(',')
     }
 
+    // Load the weather data in a separate thread
     private fun fetchWeatherData(
         currentFetchType: LastFetchType,
         fetchAction: suspend () ->

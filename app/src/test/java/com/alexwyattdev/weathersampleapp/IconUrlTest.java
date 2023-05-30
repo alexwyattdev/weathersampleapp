@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+// Unit test to check whether the url retrieval for the images are correct
 public class IconUrlTest {
 
     @Test

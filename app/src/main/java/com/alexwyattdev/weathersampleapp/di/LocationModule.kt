@@ -10,6 +10,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
+// Singleton location module to provide the FusedLocationClient
 @Module
 @InstallIn(SingletonComponent::class)
 object LocationModule {

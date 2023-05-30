@@ -5,6 +5,12 @@ import android.content.SharedPreferences
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
+// Store in the SharedPreferences the following:
+// the last searched city, state, country and if the
+// permission dialog was already shown to
+// the user, all in the SharedPreferences
+// As this project is smaller, there is no need to implement an SQL Database
+// solution
 class PreferencesManager @Inject constructor(@ApplicationContext context: Context) {
     private val sharedPreferences: SharedPreferences =
         context.getSharedPreferences("WeatherPrefs", Context.MODE_PRIVATE)

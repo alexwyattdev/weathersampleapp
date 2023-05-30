@@ -8,6 +8,7 @@ import timber.log.Timber
 class WeatherSampleApp : Application() {
     override fun onCreate() {
         super.onCreate()
+        // Initialize Timber logging
         Timber.plant(object : Timber.DebugTree() {})
     }
 }

@@ -27,6 +27,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.alexwyattdev.weathersampleapp.Constants.Companion.SEARCH_SCREEN
+import com.alexwyattdev.weathersampleapp.Constants.Companion.WEATHER_SCREEN
 import com.alexwyattdev.weathersampleapp.R
 import com.alexwyattdev.weathersampleapp.model.ErrorType
 import com.alexwyattdev.weathersampleapp.model.LocationDetails
@@ -39,12 +41,12 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private var hasLocationAccess = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             WeatherSampleAppTheme {
+                // Defining variables
                 val apiKey = stringResource(id = R.string.api_key)
                 val viewModel: WeatherViewModel = viewModel()
                 val weatherInfo by viewModel.weatherData.observeAsState()
@@ -61,6 +63,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
+                // Main content holder
                 WeatherAppContent(
                     weatherInfo,
                     errorPair,
@@ -76,6 +79,7 @@ class MainActivity : ComponentActivity() {
                     },
                 )
 
+                // Permission request result handling
                 val launcher = rememberLauncherForActivityResult(
                     ActivityResultContracts.RequestMultiplePermissions(),
                 ) { map ->
@@ -86,6 +90,7 @@ class MainActivity : ComponentActivity() {
                     )
                 }
 
+                // Permission request handling
                 LaunchedEffect(true) {
                     checkAndRequestPermissions(
                         context,
@@ -99,20 +104,24 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    // If the app obtained all permissions, try retrieving weather info for the user's current
+    // location
     private fun updateLocationAccessBasedOnPermissions(
         map: Map<String, Boolean>,
         viewModel: WeatherViewModel,
         locationObserver: Observer<LocationDetails>,
     ) {
         if (map.all { it.value }) {
-            hasLocationAccess = true
             viewModel.location.observe(this@MainActivity, locationObserver)
             viewModel.startLocationUpdates()
         } else {
-            hasLocationAccess = false
             viewModel.permissionWasAsked()
         }
     }
+
+    // Check if the app has the required permissions, if yes, retrieve the user's current
+    // location, if no then check if the user was already asked to grant permissions, if no, ask
+    // for permissions, if yes, then try loading the last searched city's weather info
 
     private fun checkAndRequestPermissions(
         context: Context,
@@ -122,16 +131,12 @@ class MainActivity : ComponentActivity() {
         apiKey: String,
     ) {
         if (hasPermissions(context)) {
-            hasLocationAccess = true
             viewModel.permissionWasAsked()
             viewModel.location.observe(this@MainActivity, locationObserver)
             viewModel.startLocationUpdates()
         } else {
-            hasLocationAccess = false
             if (viewModel.permissionWasAskedBefore()) {
-                viewModel.getCityName()?.let {
-                    viewModel.fetchWeatherByCityName(it, apiKey = apiKey)
-                }
+                viewModel.fetchWeatherByCityName(null, apiKey = apiKey)
             } else {
                 launcher.launch(
                     arrayOf(
@@ -143,6 +148,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    // Check if permissions were granted
     private fun hasPermissions(context: Context): Boolean {
         return (
             ContextCompat.checkSelfPermission(
@@ -166,20 +172,21 @@ fun WeatherAppContent(
     onSearchByCityName: (String, String, String) -> Unit,
     onErrorShown: () -> Unit,
 ) {
+    // Component to handle the navigation between the 2 screens
     val navController = rememberNavController()
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-        NavHost(navController, startDestination = "weather") {
-            composable("weather") {
+        NavHost(navController, startDestination = WEATHER_SCREEN) {
+            composable(WEATHER_SCREEN) {
                 WeatherScreen(
                     weatherInfo = weatherInfo,
                     errorType = errorPair,
                     isLoading = isLoading,
-                    navigateToSearch = { navController.navigate("search") },
+                    navigateToSearch = { navController.navigate(SEARCH_SCREEN) },
                     onRefresh = { onRefresh() },
                     onErrorShown = { onErrorShown() },
                 )
             }
-            composable("search") {
+            composable(SEARCH_SCREEN) {
                 SearchScreen(
                     onSearch = { cityName, stateCode, countryCode ->
                         navController.popBackStack()

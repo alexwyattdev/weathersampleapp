@@ -4,6 +4,7 @@ import com.alexwyattdev.weathersampleapp.model.WeatherResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 
+// Interface implementation for the API calls
 interface WeatherApi {
     @GET("data/2.5/weather")
     suspend fun getWeather(
