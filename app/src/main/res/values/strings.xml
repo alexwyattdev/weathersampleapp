@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">WeatherSampleApp</string>
+    <string name="weather_icon">Weather icon</string>
+    <string name="search">Search</string>
+    <string name="city_name">City name</string>
+    <string name="temperature">%1s°F</string>
+    <string name="temperature_feels">Feels like</string>
+    <string name="temperature_min">Minimum</string>
+    <string name="temperature_max">Maximum</string>
+    <string name="humidity">%1s%%</string>
+    <string name="humidity_label">Humidity</string>
+    <string name="wind">%1s mph</string>
+    <string name="wind_speed">Wind speed</string>
+    <string name="wind_direction">Wind direction</string>
+    <string name="weather">%1s</string>
+    <string name="error_unexpected">Unexpected error</string>
+    <string name="city_name_too_short">City name is too short</string>
+    <string name="weather_title">Weather</string>
+    <string name="no_data_available">No data available</string>
+    <string name="back">Back</string>
+    <string name="rain_1h">Rain in the last hour: %1s mm</string>
+    <string name="rain_3h">Rain in the last 3 hours: %1s mm</string>
+    <string name="error_invalid_city">Invalid city</string>
+    <string name="error_invalid_location">Invalid location\n</string>
+    <string name="select_state">Select state (US)</string>
+    <string name="select_country">Select country</string>
+</resources>
