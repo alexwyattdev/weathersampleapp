@@ -90,8 +90,9 @@ class WeatherViewModel @Inject constructor(
     }
 
     fun fetchWeatherByLocation(latitude: Double, longitude: Double, apiKey: String) {
-        lastFetchType = LastFetchType.LOCATION
-        fetchWeatherData { weatherRepository.getWeather(latitude, longitude, apiKey) }
+        fetchWeatherData(LastFetchType.LOCATION) {
+            weatherRepository.getWeather(latitude, longitude, apiKey)
+        }
     }
 
     fun fetchWeatherByCityName(
@@ -100,12 +101,13 @@ class WeatherViewModel @Inject constructor(
         countryCode: String = "",
         apiKey: String,
     ) {
-        lastFetchType = LastFetchType.CITY
         saveCityName(cityName)
         saveStateCode(stateCode)
         saveCountryCode(countryCode)
         val query = buildQuery(cityName)
-        fetchWeatherData { weatherRepository.getWeatherByCityName(query, apiKey) }
+        fetchWeatherData(LastFetchType.CITY) {
+            weatherRepository.getWeatherByCityName(query, apiKey)
+        }
     }
 
     fun getCityName(): String? = preferencesManager.getCityName()
@@ -140,11 +142,16 @@ class WeatherViewModel @Inject constructor(
         return "$cityName,${stateCode.orEmpty()},${countryCode.orEmpty()}".trimEnd(',')
     }
 
-    private fun fetchWeatherData(fetchAction: suspend () -> WeatherResponse) {
+    private fun fetchWeatherData(
+        currentFetchType: LastFetchType,
+        fetchAction: suspend () ->
+        WeatherResponse,
+    ) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
                 _weatherData.value = fetchAction().toWeatherInfo()
+                lastFetchType = currentFetchType
             } catch (e: HttpException) {
                 _errorType.value = Pair(ErrorType.ERROR, e.message)
                 Timber.e(e)
