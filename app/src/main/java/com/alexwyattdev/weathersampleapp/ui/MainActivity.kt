@@ -87,6 +87,7 @@ class MainActivity : ComponentActivity() {
                         map,
                         viewModel,
                         locationObserver,
+                        apiKey,
                     )
                 }
 
@@ -110,12 +111,14 @@ class MainActivity : ComponentActivity() {
         map: Map<String, Boolean>,
         viewModel: WeatherViewModel,
         locationObserver: Observer<LocationDetails>,
+        apiKey: String,
     ) {
         if (map.all { it.value }) {
             viewModel.location.observe(this@MainActivity, locationObserver)
             viewModel.startLocationUpdates()
         } else {
             viewModel.permissionWasAsked()
+            viewModel.fetchWeatherByCityName(null, apiKey = apiKey)
         }
     }
 
