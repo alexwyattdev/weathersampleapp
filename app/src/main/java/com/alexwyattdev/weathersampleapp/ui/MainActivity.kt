@@ -78,7 +78,13 @@ class MainActivity : ComponentActivity() {
 
                 val launcher = rememberLauncherForActivityResult(
                     ActivityResultContracts.RequestMultiplePermissions(),
-                ) { map -> updateLocationAccessBasedOnPermissions(map, viewModel) }
+                ) { map ->
+                    updateLocationAccessBasedOnPermissions(
+                        map,
+                        viewModel,
+                        locationObserver,
+                    )
+                }
 
                 LaunchedEffect(true) {
                     checkAndRequestPermissions(
@@ -96,9 +102,11 @@ class MainActivity : ComponentActivity() {
     private fun updateLocationAccessBasedOnPermissions(
         map: Map<String, Boolean>,
         viewModel: WeatherViewModel,
+        locationObserver: Observer<LocationDetails>,
     ) {
         if (map.all { it.value }) {
             hasLocationAccess = true
+            viewModel.location.observe(this@MainActivity, locationObserver)
             viewModel.startLocationUpdates()
         } else {
             hasLocationAccess = false
