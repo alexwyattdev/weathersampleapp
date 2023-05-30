@@ -156,6 +156,7 @@ fun WeatherScreen(
         }
         errorType?.let {
             scope.launch {
+                onErrorShown()
                 snackBarHostState.showSnackbar(
                     message = when (it.first) {
                         ErrorType.ERROR -> it.second ?: defaultErrorMessage
@@ -164,7 +165,6 @@ fun WeatherScreen(
                     },
                     actionLabel = defaultSnackBarResponse,
                 )
-                onErrorShown()
             }
         }
         Box(
